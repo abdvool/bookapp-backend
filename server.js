@@ -7,6 +7,7 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const server = express();
 server.use(cors())
+const bookModel = require('./modules/bookFind')
 const PORT= process.env.PORT;
 
 
@@ -16,13 +17,13 @@ const PORT= process.env.PORT;
 mongoose.connect('mongodb://localhost:27017/books');
 
 
-const bookSchema = new mongoose.Schema({
-    title: String,
-    description:String,
-    email:String
-  });
+// const bookSchema = new mongoose.Schema({
+//     title: String,
+//     description:String,
+//     email:String
+//   });
 
-  const bookModel = mongoose.model('book', bookSchema);
+//   const bookModel = mongoose.model('book', bookSchema);
 
 
 
