@@ -8,8 +8,11 @@ const mongoose = require('mongoose');
 const server = express();
 server.use(cors())
 const bookModel = require('./modules/bookFind')
-const PORT= process.env.PORT;
+const PORT = process.env.PORT;
 
+
+// server.use(express.json())
+// you need to write here if you want to use post to read the body
 
 
 
@@ -17,7 +20,8 @@ const PORT= process.env.PORT;
 mongoose.connect('mongodb://localhost:27017/books');
 
 
-// const bookSchema = new mongoose.Schema({
+// already moved to bookFind.js
+//  const bookSchema = new mongoose.Schema({
 //     title: String,
 //     description:String,
 //     email:String
@@ -27,38 +31,38 @@ mongoose.connect('mongodb://localhost:27017/books');
 
 
 
-  function seedBookInformation(){
+function seedBookInformation() {
 
-const abd = new bookModel({
-
-  
-    title: 'deathnote',
-    description:'kill people',
-    email:'abdvool@gmail.com'
-})
-
-const ahmad = new bookModel({
-
-    title: 'akame ga kill',
-    description:'fighting',
-    email:'ahmad.alhussny0@gmail.com'
-})
+    const abd = new bookModel({
 
 
+        title: 'deathnote',
+        description: 'kill people',
+        email: 'abdvool@gmail.com'
+    })
 
-const abd2 = new bookModel({
+    const ahmad = new bookModel({
 
-    title: '91days',
-    description:'Mafia',
-    email:'abdvool@gmail.com'
-})
+        title: 'akame ga kill',
+        description: 'fighting',
+        email: 'ahmad.alhussny0@gmail.com'
+    })
 
 
 
-abd.save()
-ahmad.save()
-abd2.save()
-  }
+    const abd2 = new bookModel({
+
+        title: '91days',
+        description: 'Mafia',
+        email: 'abdvool@gmail.com'
+    })
+
+
+
+    abd.save()
+    ahmad.save()
+    abd2.save()
+}
 
 
 //   seedBookInformation()
@@ -66,27 +70,29 @@ abd2.save()
 
 
 
-server.get('/',homeHandler);
+server.get('/', homeHandler);
 server.get('/getBooksOwner', getCatsHandler)
-
-function homeHandler(req,res) {
+server.get('/addBook', addBookHandler)
+//if  you want to use   it as post and send as post  and accept as post 
+//server.post('/addBook', addBookHandler) and it will be inside the body not outside 
+function homeHandler(req, res) {
 
     res.send('all good')
 
- }
+}
 
 //localhost:3001/getBooksOwner?ownerName=razan
- function getCatsHandler(req,res){
+function getCatsHandler(req, res) {
 
-     let email2 =req.query.email
+    let email2 = req.query.email
 
-     bookModel.find({email:email2},function(error,ownerData){
+    bookModel.find({ email: email2 }, function (error, ownerData) {
 
-        if(error){
+        if (error) {
 
-            console.log('error in getting data',error);
+            console.log('error in getting data', error);
 
-        }else {
+        } else {
 
             console.log(ownerData);
             res.send(ownerData)
@@ -94,14 +100,76 @@ function homeHandler(req,res) {
 
     })
 
-    
+}
 
 
+
+
+
+// /addBook?ownerName1=email&bookTitle1=killer&bookDescription1=youwilldie
+// async
+  function  addBookHandler(req,res) {
+
+console.log(req.query);
+    let {ownerName1, bookTitle1, bookDescription1} = req.query
+
+    // let {ownerName1, bookTitle1, bookDescription1} = req.body
+// her you want to change the req.body if you want to use post because it will be inside not outside belong to line 72
+
+    // ---------------
+// firstWay
+    const newBook = new bookModel({
+
+        title: bookTitle1 ,
+        description: bookDescription1  ,
+        email: ownerName1
+    })
+    // await
+     newBook.save()
+
+
+//secondWay
+
+// bookModel.create({
+//     title: bookTitle1 ,
+//     description: bookDescription1  ,
+//     email: ownerName1
+
+// })
+
+
+
+
+
+
+
+    // bookModel.find({ email:email3 }, function (error, ownerData) {
+
+    //     if (error) {
+
+    //         console.log('error in getting data', error);
+
+    //     } else {
+
+    //         console.log(ownerData);
+    //         res.send(ownerData)
+    //     }
 
 }
 
 
-server.listen(PORT,() =>{
+
+
+
+
+
+
+
+
+
+
+
+server.listen(PORT, () => {
 
     console.log(`listening on PORT ${PORT}`);
 })
