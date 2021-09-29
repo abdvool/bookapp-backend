@@ -14,10 +14,10 @@ const PORT = process.env.PORT;
 // server.use(express.json())
 // you need to write here if you want to use post to read the body
 
+mongoose.connect(`${process.env.MONGO_LINK}`, { useNewUrlParser: true, useUnifiedTopology: true });
 
 
-
-mongoose.connect('mongodb://localhost:27017/books');
+// mongoose.connect('mongodb://localhost:27017/books');
 
 
 // already moved to bookFind.js
@@ -69,7 +69,7 @@ function seedBookInformation() {
 
 
 
-
+server.get('/deleteBooks', deleteBookHandler)
 server.get('/', homeHandler);
 server.get('/getBooksOwner', getCatsHandler)
 server.get('/addBook', addBookHandler)
@@ -94,7 +94,7 @@ function getCatsHandler(req, res) {
 
         } else {
 
-            console.log(ownerData);
+            // console.log(ownerData);
             res.send(ownerData)
         }
 
@@ -106,58 +106,86 @@ function getCatsHandler(req, res) {
 
 
 
-// /addBook?ownerName1=email&bookTitle1=killer&bookDescription1=youwilldie
-// async
-  function  addBookHandler(req,res) {
+async function deleteBookHandler(req, res) {
 
-console.log(req.query);
-    let {ownerName1, bookTitle1, bookDescription1} = req.query
+    let email = req.query.email
+    let bookId = req.query.bookId
+    console.log(bookId);
+    await bookModel.deleteOne({ _id: bookId }, async function (error, data) {
 
-    // let {ownerName1, bookTitle1, bookDescription1} = req.body
-// her you want to change the req.body if you want to use post because it will be inside not outside belong to line 72
+        if (error) {
 
-    // ---------------
-// firstWay
-    const newBook = new bookModel({
+            console.log('error in getting data', error);
 
-        title: bookTitle1 ,
-        description: bookDescription1  ,
-        email: ownerName1
+        } else {
+
+            await bookModel.find({ email : email }, function (error, ownerData) {
+
+                if (error) {
+
+                    console.log('error in getting data', error);
+
+                } else {
+                    console.log('wewrewrwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
+                    console.log(ownerData);
+                    res.send(ownerData)
+                }
+
+            }
+            )
+        }
+
+
     })
-    // await
-     newBook.save()
-
-
-//secondWay
-
-// bookModel.create({
-//     title: bookTitle1 ,
-//     description: bookDescription1  ,
-//     email: ownerName1
-
-// })
-
-
-
-
-
-
-
-    // bookModel.find({ email:email3 }, function (error, ownerData) {
-
-    //     if (error) {
-
-    //         console.log('error in getting data', error);
-
-    //     } else {
-
-    //         console.log(ownerData);
-    //         res.send(ownerData)
-    //     }
 
 }
 
+// /addBook?ownerName1=email&bookTitle1=killer&bookDescription1=youwilldie
+async function addBookHandler(req, res) {
 
+    // console.log(req.query);
+    let { ownerName1, bookTitle1, bookDescription1 } = req.query
+    // let {ownerName1, bookTitle1, bookDescription1} = req.body
+    // her you want to change the req.body if you want to use post because it will be inside not outside belong to line 72
+
+    // ---------------
+    // firstWay
+    const newBook = new bookModel({
+
+        title: bookTitle1,
+        description: bookDescription1,
+        email: ownerName1
+    })
+    await newBook.save()
+
+
+    //secondWay
+
+    // bookModel.create({
+    //     title: bookTitle1 ,
+    //     description: bookDescription1  ,
+    //     email: ownerName1
+
+    // })
+
+
+
+    //  you can name ownerData what ever you want 
+    bookModel.find({ email: ownerName1 }, function (error, ownerData) {
+
+        if (error) {
+
+            console.log('error in getting data', error);
+
+        } else {
+
+            // console.log(ownerData);
+            res.send(ownerData)
+        }
+
+    }
+    )
+}
 
 
 
