@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const server = express();
 server.use(cors())
 const bookModel = require('./modules/bookFind')
+server.use(express.json());
 const PORT = process.env.PORT;
 
 
@@ -27,7 +28,7 @@ mongoose.connect(`${process.env.MONGO_LINK}`, { useNewUrlParser: true, useUnifie
 //     email:String
 //   });
 
-//   const bookModel = mongoose.model('book', bookSchema);
+// const bookModel = mongoose.model('book', bookSchema);
 
 
 
@@ -68,7 +69,7 @@ function seedBookInformation() {
 //   seedBookInformation()
 
 
-
+server.put('/update/:updateId', updateHandler)
 server.get('/deleteBooks', deleteBookHandler)
 server.get('/', homeHandler);
 server.get('/getBooksOwner', getCatsHandler)
@@ -119,7 +120,7 @@ async function deleteBookHandler(req, res) {
 
         } else {
 
-            await bookModel.find({ email : email }, function (error, ownerData) {
+            await bookModel.find({ email: email }, function (error, ownerData) {
 
                 if (error) {
 
@@ -186,6 +187,39 @@ async function addBookHandler(req, res) {
     }
     )
 }
+
+
+// ---------------
+
+
+
+async function updateHandler(req, res) {
+
+    console.log('finially');
+    let idBook = req.params.updateId;
+    let { title, description, email } = req.body;
+    bookModel.findByIdAndUpdate(idBook, { title, description, email }, (err, updata) => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log("data updated");
+            bookModel.find({ email: req.body.email }, (err, data) => {
+                if (err) {
+                    console.log("err");
+                } else {
+                    res.send(data);
+                }
+            })
+        }
+    })
+
+}
+
+
+
+
+
+
 
 
 
